@@ -63,7 +63,7 @@ fn main(req: Request) -> Result<Response, Error> {
             // Send a default synthetic response.
             Ok(Response::from_status(StatusCode::OK)
                 .with_content_type(mime::TEXT_HTML_UTF_8)
-                .with_body(include_str!("welcome-to-compute.html")))
+                .with_body("Hello, world!"))
         }
 
         // Catch all other requests and return a 404.
