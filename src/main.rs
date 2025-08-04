@@ -12,5 +12,9 @@ use fastly::{Error, Request, Response};
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
     // Forward all requests to the backend with cache override set to pass
-    Ok(req.with_pass(true).send("vcl-origin")?)
+    let mut resp = req.with_pass(true).send("vcl-origin")?;
+    // Add response header
+    resp.set_header("x-tacos", "We love tacos!");
+
+    Ok(resp)
 }
