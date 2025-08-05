@@ -13,8 +13,13 @@ use fastly::{Error, Request, Response};
 fn main(req: Request) -> Result<Response, Error> {
     // Forward all requests to the backend with cache override set to pass
     let mut resp = req.with_pass(true).send("vcl-origin")?;
+
+    if resp.get_status() == 404 {
+        resp.set_body("This is our custom Compute 404 page");
+        return Ok(resp);
+    }
+
     // Add response header
     resp.set_header("x-tacos", "We love tacos!");
-
     Ok(resp)
 }
