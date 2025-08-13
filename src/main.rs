@@ -15,7 +15,10 @@ fn main(req: Request) -> Result<Response, Error> {
     let mut resp = req.with_pass(true).send("vcl-origin")?;
 
     if resp.get_status() == 404 {
-        resp.set_body("This is our custom Compute 404 page");
+        // Load static HTML file for 404 page
+        let not_found_html = include_str!("not-found.html");
+        resp.set_body(not_found_html);
+        resp.set_content_type(fastly::mime::TEXT_HTML_UTF_8);
         return Ok(resp);
     }
 
