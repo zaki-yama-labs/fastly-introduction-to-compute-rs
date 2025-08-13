@@ -11,6 +11,15 @@ use fastly::{Error, Request, Response};
 /// If `main` returns an error, a 500 error response will be delivered to the client.
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
+    // Return robots.txt with a custom response
+    if req.get_path().ends_with("/robots.txt") {
+        let robots_txt = include_str!("robots.txt");
+        let robots_response = Response::from_body(robots_txt)
+            .with_status(200)
+            .with_content_type(fastly::mime::TEXT_PLAIN);
+        return Ok(robots_response);
+    }
+
     // Forward all requests to the backend with cache override set to pass
     let mut resp = req.with_pass(true).send("vcl-origin")?;
 
