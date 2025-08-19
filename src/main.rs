@@ -1,6 +1,6 @@
 //! Default Compute template program.
 
-use fastly::{Error, Request, Response};
+use fastly::{ConfigStore, Error, Request, Response};
 
 /// The entry point for your application.
 ///
@@ -18,6 +18,17 @@ fn main(req: Request) -> Result<Response, Error> {
             .with_status(200)
             .with_content_type(fastly::mime::TEXT_PLAIN);
         return Ok(robots_response);
+    }
+
+    // Check if there is a redirect for the URL requested.
+    // If there is, redirect the client.
+    let config = ConfigStore::open("redirects");
+    let req_path = req.get_path();
+    if let Some(dest) = config.get(req_path) {
+        let redirect_response = Response::from_body("")
+            .with_status(301)
+            .with_header("Location", dest);
+        return Ok(redirect_response);
     }
 
     // Forward all requests to the backend with cache override set to pass
