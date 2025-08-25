@@ -1,6 +1,8 @@
 //! Default Compute template program.
 
 use fastly::{ConfigStore, Error, Request, Response};
+use log;
+use log_fastly;
 
 /// The entry point for your application.
 ///
@@ -11,6 +13,15 @@ use fastly::{ConfigStore, Error, Request, Response};
 /// If `main` returns an error, a 500 error response will be delivered to the client.
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
+    log_fastly::init_simple("introduction_to_compute_rs", log::LevelFilter::Info);
+    log::info!("Request: {}", req.get_url());
+    log::info!(
+        "User-Agent: {}",
+        req.get_header("User-Agent")
+            .and_then(|ua| ua.to_str().ok())
+            .unwrap_or("not provided")
+    );
+
     // Return robots.txt with a custom response
     if req.get_path().ends_with("/robots.txt") {
         let robots_txt = include_str!("robots.txt");
